@@ -1,0 +1,712 @@
+* {
+  box-sizing: border-box;
+}
+
+.hud-wrapper {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  background: #000;
+  color: white;
+
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =====================================================
+   COMPASS
+===================================================== */
+
+.compass {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 70px;
+
+  z-index: 50;
+
+  overflow: hidden;
+
+  background: linear-gradient(
+    to bottom,
+    #4f83d2 0%,
+    #4d82d1 55%,
+    #477bc8 100%
+  );
+}
+
+.compass-scale {
+  position: absolute;
+
+  top: 7px;
+  left: 0;
+
+  width: 100%;
+
+  display: flex;
+  justify-content: space-around;
+
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.compass-ticks {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 25px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+.compass-ticks span {
+  width: 1px;
+  height: 8px;
+
+  background: rgba(255,255,255,0.8);
+}
+
+.compass-ticks .major-tick {
+  height: 18px;
+  width: 2px;
+}
+
+.heading-marker {
+  position: absolute;
+
+  left: 50%;
+  bottom: 3px;
+
+  transform: translateX(-50%);
+
+  color: red;
+
+  font-size: 25px;
+
+  line-height: 1;
+}
+
+
+/* =====================================================
+   MAIN HUD
+===================================================== */
+
+.hud-screen {
+  position: absolute;
+
+  top: 70px;
+  left: 0;
+
+  width: 100%;
+  height: calc(100vh - 70px);
+
+  overflow: hidden;
+
+  background: #4d8bd3;
+}
+
+
+/* =====================================================
+   HORIZON
+===================================================== */
+
+.horizon-container {
+  position: absolute;
+
+  inset: 0;
+
+  overflow: hidden;
+}
+
+.horizon {
+  position: absolute;
+
+  width: 300%;
+  height: 300%;
+
+  left: -100%;
+  top: -100%;
+
+  transform-origin: center center;
+
+  transition: transform 0.08s linear;
+}
+.sky {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50%;
+
+  background: linear-gradient(
+    to bottom,
+    #3f78c8 0%,
+    #4d88d1 35%,
+    #619bd9 70%,
+    #78abe0 100%
+  );
+}
+
+.ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+
+  background: linear-gradient(
+    to bottom,
+    #8aa62b 0%,
+    #78991f 35%,
+    #688918 70%,
+    #587612 100%
+  );
+}
+
+/* =====================================================
+   HORIZON LINE
+===================================================== */
+
+.horizon-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 50%;
+
+  height: 3px;
+
+  background: white;
+
+  box-shadow: 0 0 2px rgba(255,255,255,0.8);
+}
+
+
+/* =====================================================
+   PITCH LADDER
+===================================================== */
+
+.pitch {
+  position: absolute;
+
+  left: 50%;
+
+  width: 110px;
+  height: 30px;
+
+  transform: translateX(-50%);
+
+  color: white;
+
+  font-size: 16px;
+
+  text-align: center;
+
+  font-weight: normal;
+}
+
+.pitch i {
+  position: absolute;
+
+  left: 50%;
+  top: 20px;
+
+  transform: translateX(-50%);
+
+  width: 75px;
+  height: 2px;
+
+  background: white;
+}
+
+.pitch-20 {
+  top: 25%;
+}
+
+.pitch-10 {
+  top: 37%;
+}
+
+.pitch-5 {
+  top: 43%;
+}
+
+.pitch-0 {
+  top: 49%;
+}
+
+.pitch-minus5 {
+  top: 55%;
+}
+
+.pitch-minus10 {
+  top: 61%;
+}
+
+.pitch-minus20 {
+  top: 73%;
+}
+
+
+/* =====================================================
+   ROLL ARC
+===================================================== */
+
+.roll-arc {
+  position: absolute;
+
+  top: 15px;
+  left: 50%;
+
+  width: 330px;
+  height: 110px;
+
+  transform: translateX(-50%);
+
+  border-top: 2px solid white;
+
+  border-radius: 50%;
+
+  z-index: 10;
+}
+
+.roll {
+  position: absolute;
+
+  top: 3px;
+
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.r-30 {
+  left: 0;
+}
+
+.r-20 {
+  left: 14%;
+}
+
+.r-10 {
+  left: 31%;
+}
+
+.r-0 {
+  left: 49%;
+}
+
+.r-10p {
+  right: 31%;
+}
+
+.r-20p {
+  right: 14%;
+}
+
+.r-30p {
+  right: 0;
+}
+
+
+/* roll ticks */
+
+.roll-tick {
+  position: absolute;
+
+  top: 1px;
+
+  width: 2px;
+  height: 13px;
+
+  background: white;
+
+  transform-origin: center 165px;
+}
+
+.t1 {
+  left: 18%;
+  transform: rotate(-25deg);
+}
+
+.t2 {
+  left: 35%;
+  transform: rotate(-12deg);
+}
+
+.t3 {
+  left: 50%;
+  transform: rotate(0deg);
+}
+
+.t4 {
+  left: 65%;
+  transform: rotate(12deg);
+}
+
+.t5 {
+  left: 82%;
+  transform: rotate(25deg);
+}
+
+
+/* =====================================================
+   AIRCRAFT
+===================================================== */
+
+.aircraft {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 270px;
+  height: 55px;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 30;
+}
+
+.aircraft-left,
+.aircraft-right {
+  position: absolute;
+
+  top: 25px;
+
+  width: 90px;
+  height: 4px;
+
+  background: red;
+}
+
+.aircraft-left {
+  right: 50%;
+  margin-right: 14px;
+}
+
+.aircraft-right {
+  left: 50%;
+  margin-left: 14px;
+}
+
+.aircraft-center {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 22px;
+  height: 22px;
+
+  transform: translate(-50%, -50%);
+
+  border: 2px solid red;
+
+  border-radius: 50%;
+}
+
+.green-dot {
+  position: absolute;
+
+  top: 25px;
+
+  width: 7px;
+  height: 7px;
+
+  background: #4cae3b;
+
+  border-radius: 50%;
+}
+
+.left-dot {
+  left: 48px;
+}
+
+.right-dot {
+  right: 48px;
+}
+
+
+/* =====================================================
+   LEFT SPEED SCALE
+===================================================== */
+
+.left-speed {
+  position: absolute;
+
+  left: 15px;
+  top: 105px;
+
+  width: 90px;
+
+  z-index: 40;
+
+  font-size: 14px;
+}
+
+.speed-scale-row {
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 7px;
+}
+
+.speed-scale-row span {
+  width: 25px;
+  text-align: right;
+}
+
+.speed-scale-row i {
+  width: 14px;
+  height: 1px;
+
+  background: white;
+}
+
+.speed-current {
+  position: absolute;
+
+  right: -1px;
+  top: 110px;
+
+  width: 85px;
+  height: 45px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0,0,0,0.85);
+
+  border: 1px solid white;
+
+  font-size: 14px;
+  font-weight: bold;
+}
+
+
+/* =====================================================
+   RIGHT ALTITUDE SCALE
+===================================================== */
+
+.right-altitude {
+  position: absolute;
+
+  right: 15px;
+  top: 105px;
+
+  width: 90px;
+
+  z-index: 40;
+
+  font-size: 14px;
+}
+
+.alt-scale-row {
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.alt-scale-row span {
+  width: 30px;
+}
+
+.alt-scale-row i {
+  width: 14px;
+  height: 1px;
+
+  background: white;
+}
+
+.alt-current {
+  position: absolute;
+
+  left: -1px;
+  top: 110px;
+
+  width: 85px;
+  height: 45px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0,0,0,0.85);
+
+  border: 1px solid white;
+
+  font-size: 14px;
+  font-weight: bold;
+}
+
+
+/* =====================================================
+   BOTTOM LEFT
+===================================================== */
+
+.bottom-left {
+  position: absolute;
+
+  left: 20px;
+  bottom: 20px;
+
+  z-index: 50;
+
+  font-size: 15px;
+
+  line-height: 25px;
+}
+
+
+/* =====================================================
+   BOTTOM RIGHT
+===================================================== */
+
+.bottom-right {
+  position: absolute;
+
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 50;
+
+  text-align: right;
+
+  font-size: 15px;
+
+  line-height: 25px;
+}
+
+.flight-mode {
+  font-size: 18px;
+}
+
+
+/* =====================================================
+   BATTERY
+===================================================== */
+
+.battery {
+  position: absolute;
+
+  right: 22px;
+  top: 12px;
+
+  z-index: 60;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 16px;
+}
+
+.battery-icon {
+  position: relative;
+
+  width: 14px;
+  height: 22px;
+
+  border: 2px solid white;
+
+  border-radius: 2px;
+}
+
+.battery-icon::before {
+  content: "";
+
+  position: absolute;
+
+  top: -5px;
+  left: 3px;
+
+  width: 5px;
+  height: 3px;
+
+  background: white;
+}
+
+.battery-icon span {
+  position: absolute;
+
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+
+  background: #61d33d;
+}
+
+.time {
+  position: absolute;
+
+  top: 24px;
+  right: 0;
+
+  white-space: nowrap;
+
+  font-size: 15px;
+
+  font-weight: bold;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 750px) {
+
+  .compass-scale {
+    font-size: 12px;
+  }
+
+  .roll-arc {
+    width: 250px;
+  }
+
+  .aircraft {
+    width: 220px;
+  }
+
+  .aircraft-left,
+  .aircraft-right {
+    width: 70px;
+  }
+
+  .left-speed {
+    left: 5px;
+  }
+
+  .right-altitude {
+    right: 5px;
+  }
+
+  .bottom-left,
+  .bottom-right {
+    font-size: 12px;
+  }
+}
