@@ -1,0 +1,358 @@
+/* Everything is sized in cqw (1% of the HUD width), so the whole HUD
+   scales together at 1920x1080, 1366x768, 1280x720, etc. */
+.hud {
+  --pitch-scale: 0.8; /* cqw per degree of pitch — adjust to taste */
+  --tape-scale: 1.1; /* cqw per unit on speed/altitude tapes */
+  --compass-scale: 0.38; /* cqw per degree on the compass */
+  --shadow: 0 0 0.3cqw #000, 0 0 0.3cqw #000;
+
+  position: relative;
+  width: min(100%, calc(100vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+  container-type: size;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: Verdana, "DejaVu Sans", sans-serif;
+  user-select: none;
+}
+.hud *,
+.hud *::before,
+.hud *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- COMPASS ---------- */
+.compass {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 46cqw;
+  height: 4.6cqw;
+  transform: translateX(-50%);
+  overflow: hidden;
+  z-index: 3;
+  background: linear-gradient(#4b4fc2, #2f3390);
+  border-bottom: 0.15cqw solid rgba(255, 255, 255, 0.5);
+}
+.compass__tick {
+  position: absolute;
+  bottom: 0;
+  left: calc(50% + var(--off) * var(--compass-scale) * 1cqw);
+  width: 0.1cqw;
+  height: 1cqw;
+  background: #fff;
+}
+.compass__tick--major {
+  height: 1.6cqw;
+}
+.compass__tick span {
+  position: absolute;
+  bottom: 1.9cqw;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5cqw;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.compass__center {
+  position: absolute;
+  left: 50%;
+  top: 1cqw;
+  width: 5.2cqw;
+  height: 2.6cqw;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: #000;
+  font-size: 1.7cqw;
+  font-weight: bold;
+}
+.compass__marker {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 1;
+  transform: translateX(-50%);
+  border-left: 0.9cqw solid transparent;
+  border-right: 0.9cqw solid transparent;
+  border-top: 1.2cqw solid #e5202a;
+}
+
+/* ---------- SCREEN ---------- */
+.hud-screen {
+  position: absolute;
+  inset: 4.6cqw 0 0 0;
+  overflow: hidden;
+}
+
+/* ---------- MOVING HORIZON ----------
+   One transform for the whole layer. Roll is negated because when the
+   aircraft banks right the world appears to tilt left. Rotate comes
+   first so pitch shifts along the aircraft's own vertical axis. */
+.horizon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300cqw;
+  height: 300cqw;
+  margin: -150cqw 0 0 -150cqw;
+  transform: rotate(calc(var(--roll) * -1deg)) translateY(calc(var(--pitch) * var(--pitch-scale) * 1cqw));
+  will-change: transform;
+}
+.horizon__sky {
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(to top, #8ccdf0 0, #4aa0da 25cqw, #2a78c0 100cqw);
+}
+.horizon__ground {
+  position: absolute;
+  inset: 50% 0 0 0;
+  background: linear-gradient(#8a8a3a 0, #6b6a2a 25cqw, #3f3d17 100cqw);
+}
+.horizon__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0.18cqw;
+  margin-top: -0.09cqw;
+  background: #fff;
+  box-shadow: 0 0 0.3cqw rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- PITCH LADDER ---------- */
+.pitch {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - var(--p) * var(--pitch-scale) * 1cqw);
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  text-shadow: var(--shadow);
+}
+.pitch i {
+  display: block;
+  width: 11cqw;
+  height: 0.14cqw;
+  background: #fff;
+  box-shadow: 0 0 0.2cqw #000;
+}
+.pitch--minor i {
+  width: 5cqw;
+}
+.pitch span {
+  width: 2.8cqw;
+  text-align: center;
+  font-size: 1.4cqw;
+  font-weight: bold;
+}
+
+/* ---------- ROLL ARC ---------- */
+.roll-arc {
+  position: absolute;
+  top: 0.4cqw;
+  left: 50%;
+  width: 34cqw;
+  transform: translateX(-50%);
+  overflow: visible;
+  filter: drop-shadow(0 0 0.2cqw #000);
+}
+
+/* ---------- AIRCRAFT + ARM STATUS ---------- */
+.aircraft {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20cqw;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 0.2cqw #000);
+}
+.arm-status {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 9cqw);
+  transform: translateX(-50%);
+  font-size: 2.6cqw;
+  font-weight: bold;
+  color: #e5202a;
+  text-shadow: var(--shadow);
+}
+.arm-status--armed {
+  color: #3ee05a;
+}
+.arm-status--standby {
+  color: #ffb020;
+}
+
+/* ---------- SPEED / ALTITUDE TAPES ---------- */
+.tape {
+  position: absolute;
+  top: 50%;
+  width: 7cqw;
+  height: 26cqw;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.28);
+  border: 0.12cqw solid rgba(255, 255, 255, 0.55);
+}
+.tape--left {
+  left: 5cqw;
+}
+.tape--right {
+  right: 5cqw;
+}
+.tape__scale {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+}
+.tape__tick {
+  position: absolute;
+  top: calc(50% - var(--off) * var(--tape-scale) * 1cqw);
+  width: 1.2cqw;
+  height: 0.1cqw;
+  background: #fff;
+}
+.tape__tick--major {
+  width: 2.2cqw;
+}
+.tape--left .tape__tick {
+  right: 0;
+}
+.tape--right .tape__tick {
+  left: 0;
+}
+.tape__tick span {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5cqw;
+  font-weight: bold;
+  text-shadow: var(--shadow);
+}
+.tape--left .tape__tick span {
+  right: 2.8cqw;
+}
+.tape--right .tape__tick span {
+  left: 2.8cqw;
+}
+.tape__value {
+  position: absolute;
+  top: 50%;
+  min-width: 8cqw;
+  transform: translateY(-50%);
+  padding: 0.3cqw 0.6cqw;
+  background: #000;
+  border: 0.12cqw solid #fff;
+  font-size: 1.8cqw;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+}
+.tape--left .tape__value {
+  left: 0;
+}
+.tape--right .tape__value {
+  right: 0;
+}
+
+/* ---------- BATTERY ---------- */
+.battery {
+  position: absolute;
+  top: 1cqw;
+  right: 1.5cqw;
+  display: flex;
+  align-items: center;
+  gap: 0.8cqw;
+  font-size: 1.9cqw;
+  font-weight: bold;
+  text-shadow: var(--shadow);
+}
+.battery__timer {
+  font-variant-numeric: tabular-nums;
+}
+.battery__icon {
+  position: relative;
+  width: 4cqw;
+  height: 2cqw;
+  border: 0.2cqw solid #fff;
+  border-radius: 0.3cqw;
+  background: rgba(0, 0, 0, 0.45);
+}
+.battery__icon::after {
+  content: "";
+  position: absolute;
+  right: -0.7cqw;
+  top: 0.4cqw;
+  width: 0.4cqw;
+  height: 0.8cqw;
+  background: #fff;
+}
+.battery__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #3ee05a;
+}
+.battery__fill--low {
+  background: #ffb020;
+}
+.battery__fill--critical {
+  background: #e5202a;
+}
+
+/* ---------- BOTTOM STATUS ---------- */
+.bottom {
+  position: absolute;
+  bottom: 1cqw;
+  text-shadow: var(--shadow);
+  font-weight: bold;
+}
+.bottom--left {
+  left: 1.5cqw;
+}
+.bottom--center {
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.bottom--right {
+  right: 1.5cqw;
+  text-align: right;
+  font-size: 2cqw;
+  line-height: 1.2;
+}
+.speeds {
+  font-size: 2.4cqw;
+  line-height: 1.15;
+}
+.readout {
+  font-size: 1.5cqw;
+}
+.ready {
+  font-size: 2.4cqw;
+}
+.ready--bad {
+  color: #e5202a;
+}
+.ready--ok {
+  color: #3ee05a;
+}
+.flags {
+  display: flex;
+  justify-content: center;
+  gap: 2cqw;
+  font-size: 1.6cqw;
+}
+.flag--ok {
+  color: #3ee05a;
+}
+.flag--bad {
+  color: #ff4b4b;
+}
