@@ -5,7 +5,29 @@ import { useEffect, useState } from "react";
 // Any source (simulator, MAVLink, MAVSDK, ROS 2, WebSocket, serial)
 // just has to produce an object like this.
 // ============================================================
-export const DEFAULT_TELEMETRY = {
+export type Telemetry = {
+  roll: number;
+  pitch: number;
+  heading: number;
+  altitude: number;
+  speed: number;
+  groundSpeed: number | null;
+  verticalSpeed: number;
+  gps: number;
+  battery: number;
+  voltage: number;
+  current: number;
+  armed: boolean;
+  status: string | null;
+  flightMode: string;
+  ekf: boolean;
+  vibration: string;
+  flightTime: number;
+  wpDistance: number;
+  wpIndex: number;
+};
+
+export const DEFAULT_TELEMETRY: Telemetry = {
   roll: 0, // deg, + = right wing down
   pitch: 0, // deg, + = nose up
   heading: 0, // deg, 0..360
@@ -27,7 +49,7 @@ export const DEFAULT_TELEMETRY = {
   wpIndex: 0,
 };
 
-let latest = { ...DEFAULT_TELEMETRY };
+let latest: Telemetry = { ...DEFAULT_TELEMETRY };
 
 /** Latest snapshot, for non-React code. */
 export function getTelemetry() {
@@ -38,12 +60,23 @@ export function getTelemetry() {
 // TEST OVERRIDES — open e.g. /?roll=20&pitch=0 to freeze the HUD
 // on fixed values (acceptance tests 1–7). Supported keys below.
 // ============================================================
-const OVERRIDE_KEYS = ["roll", "pitch", "heading", "altitude", "speed", "verticalSpeed", "gps", "battery", "voltage", "current"];
+const OVERRIDE_KEYS = [
+  "roll",
+  "pitch",
+  "heading",
+  "altitude",
+  "speed",
+  "verticalSpeed",
+  "gps",
+  "battery",
+  "voltage",
+  "current",
+];
 
 function readOverrides() {
   const q = new URLSearchParams(window.location.search);
-  const o = {};
-  OVERRIDE_KEYS.forEach((k) => q.has(k) && (o[k] = Number(q.get(k))));
+  const o: Partial<Telemetry> = {};
+  OVERRIDE_KEYS.forEach((k) => q.has(k) && ((o as any)[k] = Number(q.get(k))));
   if (q.has("armed")) o.armed = q.get("armed") === "true";
   return Object.keys(o).length ? o : null;
 }
@@ -51,7 +84,10 @@ function readOverrides() {
 // ============================================================
 // SIMULATOR — smooth sinusoids, no random jumps.
 // ============================================================
-export function startTelemetrySimulation(callback, hz = 30) {
+export function startTelemetrySimulation(
+  callback: (t: Telemetry) => void,
+  hz = 30,
+) {
   const overrides = readOverrides();
   if (overrides) {
     latest = { ...DEFAULT_TELEMETRY, ...overrides };
@@ -91,7 +127,11 @@ export function startTelemetrySimulation(callback, hz = 30) {
 // then pass it in App.jsx: useTelemetry(startMavlinkTelemetry).
 // The HUD itself never changes.
 // ============================================================
-export function useTelemetry(start = startTelemetrySimulation) {
+export function useTelemetry(
+  start: (
+    callback: (t: Telemetry) => void,
+  ) => () => void = startTelemetrySimulation as any,
+) {
   const [telemetry, setTelemetry] = useState(getTelemetry);
   useEffect(() => start(setTelemetry), [start]);
   return telemetry;
@@ -100,9 +140,12 @@ export function useTelemetry(start = startTelemetrySimulation) {
 // ============================================================
 // PIXHAWK BRIDGE PROVIDER — receives telemetry from bridge/server.js
 // ============================================================
-export function startBridgeTelemetry(callback, url = "ws://localhost:8787") {
-  let ws;
-  let retry;
+export function startBridgeTelemetry(
+  callback: (t: Telemetry) => void,
+  url = "ws://localhost:8787",
+) {
+  let ws: WebSocket;
+  let retry: ReturnType<typeof setTimeout>;
   let stopped = false;
   let lastMsg = 0;
 

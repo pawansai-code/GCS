@@ -1,13 +1,9 @@
-   html,
+@import "tailwindcss";
+
+html,
 body,
 #root {
   margin: 0;
   height: 100%;
   background: #000;
-}
-
-.app-shell {
-  display: grid;
-  place-items: center;
-  height: 100vh;
 }
